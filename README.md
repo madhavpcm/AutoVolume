@@ -13,10 +13,10 @@ This library uses the AudioRecord library from android and uses SLA/TLA algorith
 ## Improvement
 As the sensitivity and properties of mic's across devices vary, the library potential to vary setters for
 
-`minRMS`: minimum volume level threshold
-`maxRMS`: maximum volume level threshold
-`volumeAdjustmentFactor() (based on stalta)`: STALTA (of the queue of RMS values) value calculated can be used scale the RMS value
-`queueSize`: The size of queue K, holding K previous RMS values
+- `minRMS`: minimum volume level threshold
+- `maxRMS`: maximum volume level threshold
+- `volumeAdjustmentFactor() (based on stalta)`: STALTA (of the queue of RMS values) value calculated can be used scale the RMS value
+- `queueSize`: The size of queue K, holding K previous RMS values
 
 By default the sampling rate is 44100Hz, so in one second there can be 44100 RMS Values.
 
