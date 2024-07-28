@@ -35,9 +35,9 @@ class AmbientSoundSensor(private val context: Context, private val listener: OnN
 
         Thread {
             val autoVolumeCtx = AutoVolumeControl(context)
-            val bufferQueue = BufferQueue(20)
+            val bufferQueue = BufferQueue(50)
             while (isRecording) {
-                if (bufferQueue.size() >= 20) {
+                if (bufferQueue.size() >= 50) {
                     bufferQueue.dequeueBuffer()
                 }
                 if(toggle.value) {
@@ -47,7 +47,6 @@ class AmbientSoundSensor(private val context: Context, private val listener: OnN
                     if (statusCode != 0) {
                         bufferQueue.enqueueBuffer(autoVolumeCtx.calculateRMS(buffer))
 //                    autoVolumeCtx.adjustVolume(buffer)
-
                         autoVolumeCtx.adjustVolumeWithSTALTA(bufferQueue)
                     }
 

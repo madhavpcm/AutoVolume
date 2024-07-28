@@ -26,8 +26,8 @@ class AutoVolumeControl(private val context: Context) {
     // Function to map RMS value to a volume level using a logarithmic scale
     private fun mapRMSValueToVolume(rms: Double): Int {
         // Define the min and max RMS values for the mapping
-        val minRMS = 0.0001
-        val maxRMS = 0.1
+        val minRMS = 0.1
+        val maxRMS = 1
         val maxVolume = getMaxVolume()
 
         // Calculate the logarithmic volume level
@@ -35,7 +35,10 @@ class AutoVolumeControl(private val context: Context) {
         val volume = 20 * log10(normalizedRMS + 1.0)
 
         // Map the logarithmic volume to the desired range
-        return (volume * maxVolume / 100).toInt().coerceIn(1, maxVolume)
+        Log.d("volume", volume.toString())
+        Log.d("rms", rms.toString())
+
+        return ( volume * maxVolume / 40).toInt().coerceIn(1, maxVolume)
     }
 
     // Function to adjust volume based on RMS value
@@ -97,7 +100,7 @@ class AutoVolumeControl(private val context: Context) {
         }
 
         val adjustedRMS = rmsValues.getList().average() * volumeAdjustmentFactor
-        Log.d("hi" , stalta.toString())
+//        Log.d("hi" , stalta.toString())
         val newVolume = mapRMSValueToVolume(adjustedRMS)
 
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
