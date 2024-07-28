@@ -49,11 +49,18 @@ class AutoVolumeControl(private val context: Context) {
 
     // Function to avoid frequent volume adjustments
     fun smoothVolumeAdjustment(currentVolume: Int, newVolume: Int, threshold: Int): Int {
-        return if (Math.abs(currentVolume - newVolume) > threshold) {
-            newVolume
-        } else {
-            currentVolume
+        var returnVolume: Int
+
+        if(currentVolume > newVolume) {
+            returnVolume = newVolume
         }
+         else if (Math.abs(currentVolume - newVolume) > threshold) {
+            returnVolume = newVolume
+        } else {
+             returnVolume = currentVolume
+        }
+
+        return returnVolume
     }
 
     // Function to calculate STA/LTA ratio from RMS values
@@ -93,7 +100,7 @@ class AutoVolumeControl(private val context: Context) {
         val stalta = calculateSTALTA(rmsValues)
 
         // Normalize the volume control based on STA/LTA ratio
-        val volumeAdjustmentFactor = if ( stalta >  1 ) 2.0 else 0.25
+        val volumeAdjustmentFactor = if ( stalta >  1 ) 1.0 else 0.5
 
         if (rmsValues.isEmpty()) {
             return
@@ -101,8 +108,10 @@ class AutoVolumeControl(private val context: Context) {
 
         val adjustedRMS = rmsValues.getList().average() * volumeAdjustmentFactor
 //        Log.d("hi" , stalta.toString())
+        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         val newVolume = mapRMSValueToVolume(adjustedRMS)
+        val smoothedVolume = smoothVolumeAdjustment(currentVolume, newVolume, 4)
 
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, smoothedVolume, 0)
     }
 }
