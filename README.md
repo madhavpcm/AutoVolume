@@ -22,7 +22,7 @@ By default the sampling rate is 44100Hz, so in one second there can be 44100 RMS
 
 
 ## Why should I leave my mic on?
-ANC devices have mics which are almost always on and most people find it totally OK to use such devices in their day to day life. For these devices, this library will be surely of use, which can set the volume level media playback based on ambient noise.
+ANC devices having mics, which are almost always on :D, most people find it totally OK to use such devices in their day to day life. For these devices, this library will be surely of use, which can set the volume level media playback based on ambient noise.
 With scientific testing and development, ensuring audio playback at a nominal level which is not hazardous to the human ear can be ensured.
 
 At the moment we did not find any way to directly access the ANC mic from Android SDK, and are currently using the normal mic with AudioRecorder (android sdk).
