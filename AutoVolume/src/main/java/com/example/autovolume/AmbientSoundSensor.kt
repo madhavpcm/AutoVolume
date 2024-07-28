@@ -27,19 +27,17 @@ class AmbientSoundSensor(private val context: Context, private val listener: OnN
             // Handle permission request
             return
         }
-
         audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, BUFFER_SIZE)
         audioRecord.startRecording()
         isRecording = true
 
         Thread {
             val buffer = ShortArray(BUFFER_SIZE)
-            val staLtaAlgorithm = STALTAAlgorithm()
+            val autoVolumeCtx = AutoVolumeControl(context)
 
             while (isRecording) {
                 audioRecord.read(buffer, 0, BUFFER_SIZE)
-                val staLtaValue = staLtaAlgorithm.calculateSTALTA(buffer, SAMPLE_RATE)
-                listener.onNoiseDetected(staLtaValue)
+                autoVolumeCtx.adjustVolume(buffer)
             }
 
             audioRecord.stop()
