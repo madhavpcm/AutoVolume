@@ -8,6 +8,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Queue
 
 class AmbientSoundSensor(private val context: Context, private val listener: OnNoiseDetectedListener,  private val toggle: MutableStateFlow<Boolean>) {
 
@@ -34,10 +35,9 @@ class AmbientSoundSensor(private val context: Context, private val listener: OnN
 
         Thread {
             val autoVolumeCtx = AutoVolumeControl(context)
-            val bufferQueue = BufferQueue(10)
-
+            val bufferQueue = BufferQueue(20)
             while (isRecording) {
-                if (bufferQueue.size() >= 10) {
+                if (bufferQueue.size() >= 20) {
                     bufferQueue.dequeueBuffer()
                 }
                 if(toggle.value) {
@@ -45,7 +45,7 @@ class AmbientSoundSensor(private val context: Context, private val listener: OnN
 
                     val statusCode = audioRecord.read(buffer, 0, BUFFER_SIZE)
                     if (statusCode != 0) {
-                        bufferQueue.enqueueBuffer(buffer)
+                        bufferQueue.enqueueBuffer(autoVolumeCtx.calculateRMS(buffer))
 //                    autoVolumeCtx.adjustVolume(buffer)
 
                         autoVolumeCtx.adjustVolumeWithSTALTA(bufferQueue)

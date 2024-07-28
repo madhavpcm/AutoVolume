@@ -4,14 +4,14 @@ import java.util.LinkedList
 import java.util.Queue
 
 class BufferQueue(bufferSize: Int) {
-    private val bufferQueue: Queue<ShortArray> = LinkedList()
+    private val bufferQueue: Queue<Double> = LinkedList()
     private val bufferSize = bufferSize
 
-    fun enqueueBuffer(buffer: ShortArray) {
+    fun enqueueBuffer(buffer: Double) {
         bufferQueue.add(buffer)
     }
 
-    fun dequeueBuffer(): ShortArray? {
+    fun dequeueBuffer(): Double? {
         return bufferQueue.remove()
     }
 
@@ -23,7 +23,11 @@ class BufferQueue(bufferSize: Int) {
         return bufferQueue.size
     }
 
-    operator fun iterator(): Iterator<ShortArray> {
+    operator fun iterator(): Iterator<Double> {
         return bufferQueue.iterator()
+    }
+
+    fun getList(): List<Double> {
+        return bufferQueue.toList()
     }
 }

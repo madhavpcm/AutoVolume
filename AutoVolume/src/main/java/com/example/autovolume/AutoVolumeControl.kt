@@ -5,12 +5,13 @@ import kotlin.math.sqrt
 import android.media.AudioManager
 import android.content.Context
 import android.media.AudioRecord
+import android.util.Log
 
 class AutoVolumeControl(private val context: Context) {
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
     // Function to calculate RMS value of a buffer
-    private fun calculateRMS(buffer: ShortArray): Double {
+     fun calculateRMS(buffer: ShortArray): Double {
         var sum = 0.0
         for (sample in buffer) {
             sum += sample * sample
@@ -53,12 +54,12 @@ class AutoVolumeControl(private val context: Context) {
     }
 
     // Function to calculate STA/LTA ratio from RMS values
-    private fun  calculateSTALTA(rmsValues: List<Double>): Double {
-        val shortWindow = rmsValues.size / 10 // 10% window
-        val longWindow = rmsValues.size // 100% window
+    private fun  calculateSTALTA(rmsValues: BufferQueue): Double {
+        val shortWindow = rmsValues.size() / 10 // 10% window
+        val longWindow = rmsValues.size() // 100% window
 
-        val sta = rmsValues.take(shortWindow).average()
-        val lta = rmsValues.take(longWindow).average()
+        val sta = rmsValues.getList().take(shortWindow).average()
+        val lta = rmsValues.getList().take(longWindow).average()
 
         if (lta.isNaN() || sta.isNaN() || lta == 0.0) {
             return 0.0
@@ -67,41 +68,38 @@ class AutoVolumeControl(private val context: Context) {
         return sta / lta
     }
 
-    // Function to get RMS values from buffer with a sliding window
-    private fun getRMSValues(bufferQueue: BufferQueue): List<Double> {
-        val rmsValues = mutableListOf<Double>()
-
-        for (buffer in bufferQueue) {
-            rmsValues.add(calculateRMS(buffer))
-        }
-
-        return rmsValues
-    }
+//    // Function to get RMS values from buffer with a sliding window
+//    private fun getRMSValues(bufferQueue: BufferQueue): List<Double> {
+//        val rmsValues = mutableListOf<Double>()
+//
+//        for (buffer in bufferQueue) {
+//            rmsValues.add(calculateRMS(buffer))
+//        }
+//
+//        return rmsValues
+//    }
 
     // Function to adjust volume based on RMS and STA/LTA ratio
-    fun adjustVolumeWithSTALTA(bufferQueue: BufferQueue) {
-
-        if (bufferQueue.isEmpty()) {
-            return
-        }
-
-
-        val rmsValues = getRMSValues(bufferQueue)
-        val stalta = calculateSTALTA(rmsValues)
-
-        // Normalize the volume control based on STA/LTA ratio
-        val volumeAdjustmentFactor = if (stalta > 1.0) 1.0 else 0.5
+    fun adjustVolumeWithSTALTA(rmsValues: BufferQueue) {
 
         if (rmsValues.isEmpty()) {
             return
         }
 
-        val adjustedRMS = rmsValues.average() * volumeAdjustmentFactor
 
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val stalta = calculateSTALTA(rmsValues)
+
+        // Normalize the volume control based on STA/LTA ratio
+        val volumeAdjustmentFactor = if ( stalta >  1 ) 2.0 else 0.25
+
+        if (rmsValues.isEmpty()) {
+            return
+        }
+
+        val adjustedRMS = rmsValues.getList().average() * volumeAdjustmentFactor
+        Log.d("hi" , stalta.toString())
         val newVolume = mapRMSValueToVolume(adjustedRMS)
-        val smoothedVolume = smoothVolumeAdjustment(currentVolume, newVolume, 2)
 
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, smoothedVolume, 0)
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0)
     }
 }
