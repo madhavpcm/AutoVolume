@@ -100,7 +100,7 @@ class AutoVolumeControl(private val context: Context) {
         val stalta = calculateSTALTA(rmsValues)
 
         // Normalize the volume control based on STA/LTA ratio
-        val volumeAdjustmentFactor = if ( stalta >  1 ) 1.0 else 0.5
+        val volumeAdjustmentFactor = if ( stalta >  1 ) 1.0 else 0.25
 
         if (rmsValues.isEmpty()) {
             return
