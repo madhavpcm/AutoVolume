@@ -1,7 +1,7 @@
 # AutoVolume Android SDK Library
 
 As of now, there exists no library for setting an auto-volume option like auto-brightness in Android. We propose a library which allows any android app developer to set the application volume based on the ambient noise to the device.
-This library uses the AudioRecord library from android and uses SLA/TLA algorithm on the volume measured. The algorithm is implemented on a decibel scale like in this [article](https://www.quicklogic.com/wp-content/uploads/2018/12/QL-Auto-Brightness-How-to-Improve-Android-OS-in-Handheld-Devices-White-Paper.pdf).
+This library uses the AudioRecord library from android and uses STA/LTA algorithm on the volume measured. The algorithm is implemented on a decibel scale like in this [article](https://www.quicklogic.com/wp-content/uploads/2018/12/QL-Auto-Brightness-How-to-Improve-Android-OS-in-Handheld-Devices-White-Paper.pdf).
 
 ## Dev experience
 ```kotlin
