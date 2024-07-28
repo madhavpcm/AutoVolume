@@ -59,6 +59,17 @@ override fun onNoiseDetected(staLtaValue: Double) {
 - some_callback would be a class which has an onNoiseDetected() callback implemented
 - toggle could be used enable or disable the auto volume
 
+## Timeline
+- Initial template code for Kotlin library based project with Demo App created.
+- Ambient Sound sensing intial algorithm developed.
+- Adding basic UI to interact with library.
+- Fine tuning algorithm for real world scenario
+
+## Challenges Faced:
+- Figuring out the values for implementing STA LTA based algorithm for Ambient Sound Sensing.
+- Fine tuning for real world noise scenarios.
+- Both of us haven't worked on Kotlin before :)
+
 ## Improvement
 As the sensitivity and properties of mic's across devices vary, the library potential to vary setters for
 
