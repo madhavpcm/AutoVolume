@@ -3,9 +3,58 @@
 As of now, there exists no library for setting an auto-volume option like auto-brightness in Android. We propose a library which allows any android app developer to set the application volume based on the ambient noise to the device.
 This library uses the AudioRecord library from android and uses STA/LTA algorithm on the volume measured. The algorithm is implemented on a decibel scale like in this [article](https://www.quicklogic.com/wp-content/uploads/2018/12/QL-Auto-Brightness-How-to-Improve-Android-OS-in-Handheld-Devices-White-Paper.pdf).
 
-## Dev experience
+## To use Library
+
+Steps:
+1. Clone the Repository:
+
+```
+git clone https://github.com/madhavpcm/AutoVolume
+```
+2. Include the Library Module in Your Project:
+
+    Copy the AutoVolume folder from the Project and add to your application
+
+3. Add to settings.gradle of your app
+```
+include(":AutoVolume")
+```
+   
+4. Add the Dependency in Your build.gradle:
+
+In your app's build.gradle file, add a dependency on the library module:
+
+```
+implementation(project(":AutoVolume"))
+```
+5. Sync Your Project:
+
+   Sync your Gradle project to include the new module.
+
+## Add in app code
+1. Add in your activity
 ```kotlin
-        ambientSoundSensor = AmbientSoundSensor(<app_context>, <some_callback>, <toggle>)
+class YourAppActivity : AnyExistingActivies(), AmbientSoundSensor.OnNoiseDetectedListener
+```
+2. Initialise Ambient Sound Sensor
+```
+ override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // yourViewModel.isAutoVolumeEnabled() should be a MutableStateFlow<Boolean> 
+        // indicating UI to enable/disable ambient sound listening
+        ambientSoundSensor = AmbientSoundSensor(this, this, yourViewModel.isAutoVolumeEnabled())
+
+        setContent {
+            MainScreen(viewModel = yourViewModel)
+        }
+    }
+```
+3. Override onNoiseDetected
+```
+override fun onNoiseDetected(staLtaValue: Double) {
+        yourViewModel.updateNoiseLevel(staLtaValue) // your UI updates
+}
 ```
 - some_callback would be a class which has an onNoiseDetected() callback implemented
 - toggle could be used enable or disable the auto volume
