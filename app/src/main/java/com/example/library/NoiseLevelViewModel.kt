@@ -1,10 +1,9 @@
 package com.example.library
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.media.AudioManager
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,39 +22,37 @@ class NoiseLevelViewModel(private val context: Context) : ViewModel() {
 
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val volumeCheckRunnable = object : Runnable {
+        override fun run() {
+            updateCurrentVolumeLevel()
+            handler.postDelayed(this, 1000) // Check volume every 1 second
+        }
+    }
+
     init {
-        updateCurrentVolumeLevel()
-        registerVolumeChangeReceiver()
+        startVolumeChecking()
     }
 
     fun isAutoVolumeEnabled(): MutableStateFlow<Boolean> {
-        return _isAutoVolumeEnabled;
+        return _isAutoVolumeEnabled
     }
 
-    private fun registerVolumeChangeReceiver() {
-        val filter = IntentFilter()
-        filter.addAction("android.media.VOLUME_CHANGED_ACTION")
-        this.context.registerReceiver(volumeChangeReceiver, filter)
-    }
-
-    private val volumeChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            updateCurrentVolumeLevel()
-        }
+    private fun startVolumeChecking() {
+        handler.post(volumeCheckRunnable)
     }
 
     fun updateNoiseLevel(staLtaValue: Double) {
         viewModelScope.launch {
             _noiseLevel.value = "Noise level: $staLtaValue"
-            updateCurrentVolumeLevel()
         }
     }
 
     private fun updateCurrentVolumeLevel() {
         val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-        val volumePercentage = (currentVolume * 100 / maxVolume).toInt()
-        _currentVolumeLevel.value = "Volume: $currentVolume%"
+        val volumePercentage = (currentVolume * 100 / maxVolume)
+        _currentVolumeLevel.value = "Volume: $volumePercentage%"
     }
 
     fun toggleAutoVolumeAdjustment() {
@@ -66,6 +63,6 @@ class NoiseLevelViewModel(private val context: Context) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        context.unregisterReceiver(volumeChangeReceiver)
+        handler.removeCallbacks(volumeCheckRunnable)
     }
 }
