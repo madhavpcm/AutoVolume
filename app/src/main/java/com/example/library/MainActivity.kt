@@ -59,12 +59,6 @@ class MainActivity : ComponentActivity(), AmbientSoundSensor.OnNoiseDetectedList
     }
 
     override fun onNoiseDetected(staLtaValue: Double) {
-        if (noiseLevelViewModel.isAutoVolumeEnabled.value) {
-            val threshold = 3.0
-            val lowVolumeLevel = 2
-            val normalVolumeLevel = 5
-            volumeAdjuster.adjustVolume(staLtaValue, threshold, lowVolumeLevel, normalVolumeLevel)
-        }
         noiseLevelViewModel.updateNoiseLevel(staLtaValue)
     }
 }
